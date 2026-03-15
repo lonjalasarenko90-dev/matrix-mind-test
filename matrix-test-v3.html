@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Матриця Мислення — Закон чи Благодать?</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════
+   RESET & ROOT
+══════════════════════════════════════════════════ */
+:root {
+  --bg:        #0a0a0d;
+  --surface:   #111118;
+  --surface2:  #1a1a24;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.13);
+
+  --law:       #c0392b;
+  --law-light: #e74c3c;
+  --law-glow:  rgba(192,57,43,0.35);
+
+  --grace:     #1abc9c;
+  --grace-light:#2ecc71;
+  --grace-glow: rgba(26,188,156,0.35);
+
+  --gold:      #e8b84b;
+  --gold-dim:  rgba(232,184,75,0.18);
+  --gold-glow: rgba(232,184,75,0.4);
+
+  --white:     #f0ede8;
+  --muted:     rgba(240,237,232,0.5);
+  --faint:     rgba(240,237,232,0.12);
+
+  --r: 12px;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ══════════════════════════════════════════════════
+   CINEMATIC BG
+══════════════════════════════════════════════════ */
+.hero-bg {
+  position: fixed; inset: 0; z-index: 0;
+  overflow: hidden;
+}
+
+.hero-bg-gradient {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 20% 40%, rgba(192,57,43,0.18) 0%, transparent 60%),
+              radial-gradient(ellipse 80% 60% at 80% 60%, rgba(26,188,156,0.14) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 80% at 50% 100%, rgba(232,184,75,0.06) 0%, transparent 60%),
+              var(--bg);
+  transition: background 1.5s ease;
+}
+
+.hero-bg-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 100% 100% at 50% 50%, black 20%, transparent 80%);
+}
+
+/* Vignette */
+body::after {
+  content:''; position:fixed; inset:0; z-index:1; pointer-events:none;
+  background: radial-gradient(ellipse 140% 120% at 50% 50%, transparent 40%, rgba(0,0,0,0.7) 100%);
+}
+
+/* Noise */
+body::before {
+  content:''; position:fixed; inset:0; z-index:2; pointer-events:none; opacity:0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Particles */
+.particles { position:fixed; inset:0; z-index:3; pointer-events:none; overflow:hidden; }
+.pt {
+  position:absolute; border-radius:50%;
+  animation: ptFloat linear infinite;
+  will-change: transform;
+}
+@keyframes ptFloat {
+  0%   { transform: translateY(110vh) scale(0); opacity:0; }
+  8%   { opacity:1; }
+  92%  { opacity:0.5; }
+  100% { transform: translateY(-20px) scale(1.8); opacity:0; }
+}
+
+/* ══════════════════════════════════════════════════
+   SCREENS
+══════════════════════════════════════════════════ */
+.screen {
+  position: relative; z-index: 10;
+  display: none;
+  min-height: 100vh;
+}
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  animation: screenIn 0.8s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes screenIn {
+  from { opacity:0; transform: translateY(32px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════════════════
+   NAVBAR
+══════════════════════════════════════════════════ */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 48px;
+  position: relative;
+}
+
+.logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+.logo span { color: var(--white); opacity: 0.5; }
+
+/* Global counter pill */
+.global-counter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+.counter-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--grace-light);
+  box-shadow: 0 0 8px var(--grace);
+  animation: blink 1.8s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes blink {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:0.4; transform:scale(0.7); }
+}
+.counter-num { color: var(--white); font-weight: 600; }
+.counter-label { color: var(--muted); }
+
+/* ══════════════════════════════════════════════════
+   INTRO HERO
+══════════════════════════════════════════════════ */
+#intro {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.hero-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 24px 80px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--gold-dim);
+  border: 1px solid rgba(232,184,75,0.3);
+  padding: 7px 18px;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 32px;
+  animation: fadeDown 0.8s ease 0.1s both;
+}
+
+.hero-badge::before { content:'✦'; font-size:0.6rem; }
+
+@keyframes fadeDown {
+  from { opacity:0; transform:translateY(-12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+h1.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  margin-bottom: 32px;
+  animation: fadeDown 0.8s ease 0.2s both;
+}
+h1.hero-title em {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--gold);
+  display: block;
+}
+
+.hero-subtitle {
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: var(--muted);
+  max-width: 560px;
+  margin-bottom: 48px;
+  animation: fadeDown 0.8s ease 0.3s both;
+}
+
+/* Two-column OS visual */
+.os-visual {
+  display: grid;
+  grid-template-columns: 1fr 56px 1fr;
+  gap: 0;
+  width: 100%;
+  max-width: 620px;
+  margin-bottom: 52px;
+  animation: fadeDown 0.8s ease 0.4s both;
+}
+
+.os-panel {
+  padding: 28px 28px 24px;
+  position: relative;
+  overflow: hidden;
+}
+.os-panel::before {
+  content:'';
+  position:absolute; inset:0;
+  opacity:0.07;
+}
+.os-panel.left {
+  background: rgba(192,57,43,0.12);
+  border: 1px solid rgba(192,57,43,0.25);
+  border-right: none;
+  border-radius: var(--r) 0 0 var(--r);
+}
+.os-panel.left::before { background: linear-gradient(135deg, var(--law) 0%, transparent 60%); }
+.os-panel.right {
+  background: rgba(26,188,156,0.08);
+  border: 1px solid rgba(26,188,156,0.2);
+  border-left: none;
+  border-radius: 0 var(--r) var(--r) 0;
+}
+.os-panel.right::before { background: linear-gradient(225deg, var(--grace) 0%, transparent 60%); }
+
+.os-icon { font-size: 2rem; margin-bottom: 12px; display: block; }
+.os-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.os-panel.left  .os-name { color: var(--law-light); }
+.os-panel.right .os-name { color: var(--grace); }
+.os-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+.os-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface2);
+  border-top: 1px solid var(--border2);
+  border-bottom: 1px solid var(--border2);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-style: italic;
+  color: var(--gold);
+  position: relative;
+}
+.os-divider::before, .os-divider::after {
+  content:'';
+  position:absolute;
+  left:0; right:0;
+  height:1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity:0.3;
+}
+.os-divider::before { top:0; } .os-divider::after { bottom:0; }
+
+/* Stats row */
+.stats-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeDown 0.8s ease 0.5s both;
+}
+.stat-pill {
+  padding: 7px 16px;
+  border: 1px solid var(--border2);
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--surface);
+}
+
+.cta-wrap {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeDown 0.8s ease 0.6s both;
+}
+
+/* ══════════════════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════════════════ */
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 52px;
+  background: var(--gold);
+  color: #08070a;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.btn-cta::after {
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+.btn-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 40px var(--gold-glow); }
+.btn-cta:hover::after { transform: translateX(100%); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 36px;
+  background: transparent;
+  color: var(--white);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+.btn-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+}
+.btn-sm-gold { background: var(--gold); color: #08070a; }
+.btn-sm-gold:hover { box-shadow: 0 8px 28px var(--gold-glow); transform: translateY(-1px); }
+.btn-sm-outline { background: transparent; border: 1px solid var(--border2); color: var(--white); }
+.btn-sm-outline:hover { border-color: var(--gold); color: var(--gold); }
+.btn-sm-green { background: var(--grace); color: #08070a; }
+.btn-sm-green:hover { box-shadow: 0 8px 28px var(--grace-glow); transform: translateY(-1px); }
+
+/* ══════════════════════════════════════════════════
+   QUIZ SCREEN
+══════════════════════════════════════════════════ */
+#quiz {
+  justify-content: flex-start;
+}
+
+.quiz-inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 24px 60px;
+}
+
+/* Cinematic top progress */
+.cinema-progress {
+  width: 100%;
+  max-width: 760px;
+  margin-bottom: 52px;
+}
+
+.cp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 16px;
+}
+
+.cp-left {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.cp-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.5rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--white);
+}
+.cp-total {
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+
+.cp-theme {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.cp-track {
+  height: 2px;
+  background: var(--border);
+  position: relative;
+  overflow: visible;
+}
+.cp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--law), var(--gold), var(--grace));
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+}
+.cp-fill::after {
+  content:'';
+  position:absolute;
+  right:-1px; top:50%;
+  transform:translateY(-50%);
+  width:10px; height:10px;
+  background: var(--gold);
+  border-radius:50%;
+  box-shadow: 0 0 16px var(--gold);
+}
+
+/* Question card */
+.q-card {
+  width: 100%;
+  max-width: 760px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  padding: 52px 52px 44px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 28px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+}
+.q-card::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:3px;
+  background: linear-gradient(90deg, var(--law), var(--gold) 50%, var(--grace));
+}
+.q-card-glow {
+  position:absolute; inset:0;
+  border-radius:16px;
+  pointer-events:none;
+  transition: box-shadow 0.5s ease;
+}
+
+.q-card.lean-law .q-card-glow    { box-shadow: inset 0 0 60px rgba(192,57,43,0.08); }
+.q-card.lean-grace .q-card-glow  { box-shadow: inset 0 0 60px rgba(26,188,156,0.08); }
+
+.q-text-main {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.4rem, 3.2vw, 1.9rem);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--white);
+  margin-bottom: 48px;
+  min-height: 88px;
+  transition: opacity 0.3s ease;
+}
+
+/* Scale */
+.scale-wrap { margin-bottom: 8px; }
+
+.scale-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.s-btn {
+  flex: 1;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 300;
+  color: var(--muted);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  position: relative;
+  overflow: hidden;
+}
+.s-btn::before {
+  content:'';
+  position:absolute; inset:0;
+  border-radius:10px;
+  opacity:0;
+  transition: opacity 0.22s ease;
+}
+.s-btn[data-val="1"]::before { background: linear-gradient(135deg, rgba(192,57,43,0.8), rgba(192,57,43,0.5)); }
+.s-btn[data-val="2"]::before { background: linear-gradient(135deg, rgba(192,57,43,0.5), rgba(192,57,43,0.25)); }
+.s-btn[data-val="3"]::before { background: linear-gradient(135deg, rgba(232,184,75,0.4), rgba(232,184,75,0.2)); }
+.s-btn[data-val="4"]::before { background: linear-gradient(135deg, rgba(26,188,156,0.4), rgba(26,188,156,0.25)); }
+.s-btn[data-val="5"]::before { background: linear-gradient(135deg, rgba(26,188,156,0.8), rgba(26,188,156,0.5)); }
+
+.s-btn span { position:relative; z-index:1; }
+.s-btn:hover { transform: translateY(-4px); border-color: var(--border2); }
+.s-btn:hover::before { opacity:0.6; }
+
+.s-btn.selected {
+  color: var(--white);
+  border-color: transparent;
+  transform: translateY(-4px);
+}
+.s-btn.selected::before { opacity:1; }
+.s-btn[data-val="1"].selected,
+.s-btn[data-val="2"].selected { box-shadow: 0 8px 32px rgba(192,57,43,0.4); }
+.s-btn[data-val="3"].selected { box-shadow: 0 8px 32px rgba(232,184,75,0.3); }
+.s-btn[data-val="4"].selected,
+.s-btn[data-val="5"].selected { box-shadow: 0 8px 32px rgba(26,188,156,0.4); }
+
+.scale-endpoints {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.scale-endpoints .ep-law   { color: rgba(231,76,60,0.7); }
+.scale-endpoints .ep-grace { color: rgba(46,204,113,0.7); }
+
+/* Nav */
+.q-nav {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.q-hint {
+  font-size: 0.75rem;
+  color: rgba(240,237,232,0.25);
+  font-style: italic;
+  animation: hintPulse 2.2s ease-in-out infinite;
+}
+@keyframes hintPulse {
+  0%,100% { opacity:0.4; } 50% { opacity:1; }
+}
+
+/* ══════════════════════════════════════════════════
+   RESULT SCREEN
+══════════════════════════════════════════════════ */
+#result { justify-content: flex-start; }
+
+.result-hero-section {
+  width: 100%;
+  padding: 60px 24px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.result-hero-section::before {
+  content:'';
+  position:absolute;
+  top:-200px; left:50%; transform:translateX(-50%);
+  width:600px; height:600px;
+  border-radius:50%;
+  filter:blur(100px);
+  pointer-events:none;
+  transition: background 0.8s ease;
+}
+.result-hero-section.law::before   { background: rgba(192,57,43,0.25); }
+.result-hero-section.grace::before { background: rgba(26,188,156,0.2); }
+.result-hero-section.mixed::before { background: rgba(232,184,75,0.18); }
+
+.result-icon-wrap {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  margin-bottom: 28px;
+  position: relative;
+  animation: iconReveal 0.8s cubic-bezier(0.16,1,0.3,1) 0.2s both;
+}
+.result-icon-wrap::before {
+  content:'';
+  position:absolute; inset:-2px;
+  border-radius:50%;
+  animation: spin 8s linear infinite;
+}
+.result-hero-section.law   .result-icon-wrap { background: rgba(192,57,43,0.2); }
+.result-hero-section.law   .result-icon-wrap::before { background: conic-gradient(var(--law), transparent, var(--law)); }
+.result-hero-section.grace .result-icon-wrap { background: rgba(26,188,156,0.15); }
+.result-hero-section.grace .result-icon-wrap::before { background: conic-gradient(var(--grace), transparent, var(--grace)); }
+.result-hero-section.mixed .result-icon-wrap { background: rgba(232,184,75,0.15); }
+.result-hero-section.mixed .result-icon-wrap::before { background: conic-gradient(var(--gold), transparent, var(--gold)); }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+@keyframes iconReveal {
+  from { transform:scale(0) rotate(-30deg); opacity:0; }
+  to   { transform:scale(1) rotate(0deg);  opacity:1; }
+}
+
+.result-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+  animation: fadeDown 0.6s ease 0.3s both;
+}
+
+.result-main-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  margin-bottom: 60px;
+  animation: fadeDown 0.6s ease 0.4s both;
+}
+.result-hero-section.law   .result-main-title { color: var(--law-light); }
+.result-hero-section.grace .result-main-title { color: var(--grace); }
+.result-hero-section.mixed .result-main-title { color: var(--gold); }
+
+/* ── Score gauge ── */
+.score-section {
+  width: 100%;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 48px 24px;
+  display: flex;
+  justify-content: center;
+  animation: fadeDown 0.6s ease 0.5s both;
+}
+
+.score-inner {
+  width: 100%;
+  max-width: 680px;
+}
+
+.score-labels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.score-label-item { display: flex; flex-direction: column; gap: 4px; }
+.score-label-item:last-child { text-align: right; align-items: flex-end; }
+
+.slabel-name {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.slabel-law   { color: var(--law-light); }
+.slabel-grace { color: var(--grace); }
+
+.slabel-pct {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3rem;
+  font-weight: 300;
+  line-height: 1;
+}
+.slabel-law-pct   { color: var(--law-light); }
+.slabel-grace-pct { color: var(--grace); }
+
+/* Dual gauge bar */
+.gauge-bar {
+  height: 16px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+}
+
+.gauge-law-fill {
+  background: linear-gradient(90deg, rgba(139,30,20,0.8), var(--law-light));
+  border-radius: 8px 0 0 8px;
+  transition: width 1.6s cubic-bezier(0.16,1,0.3,1);
+  width: 0%;
+  position: relative;
+}
+.gauge-law-fill::after {
+  content:'';
+  position:absolute; right:0; top:0; bottom:0;
+  width:2px;
+  background: rgba(255,255,255,0.4);
+}
+
+.gauge-grace-fill {
+  background: linear-gradient(90deg, var(--grace), rgba(39,174,96,0.8));
+  border-radius: 0 8px 8px 0;
+  transition: width 1.6s cubic-bezier(0.16,1,0.3,1) 0.1s;
+  width: 0%;
+}
+
+/* ── Result content ── */
+.result-content {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 52px 24px 80px;
+  animation: fadeDown 0.6s ease 0.6s both;
+}
+
+.result-description {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: rgba(240,237,232,0.75);
+  font-weight: 300;
+  margin-bottom: 48px;
+}
+
+/* Quotes */
+.quotes-title {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+
+.quote-item {
+  border-left: 2px solid var(--gold);
+  padding: 18px 24px;
+  margin-bottom: 14px;
+  background: var(--surface);
+  border-radius: 0 8px 8px 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.65;
+  color: rgba(240,237,232,0.72);
+  animation: slideFromLeft 0.5s ease both;
+}
+.quote-item:nth-child(2) { animation-delay: 0.1s; }
+.quote-item:nth-child(3) { animation-delay: 0.2s; }
+@keyframes slideFromLeft {
+  from { opacity:0; transform:translateX(-16px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+
+/* CTA box */
+.cta-card {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 32px 36px;
+  margin: 40px 0 48px;
+  position: relative;
+  overflow: hidden;
+}
+.cta-card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background: linear-gradient(90deg, var(--law), var(--gold), var(--grace));
+}
+.cta-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+.cta-card-text {
+  font-size: 0.93rem;
+  line-height: 1.8;
+  color: var(--muted);
+  font-weight: 300;
+}
+
+/* Actions */
+.result-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 60px;
+}
+
+/* Share image section */
+.share-section {
+  border-top: 1px solid var(--border);
+  padding-top: 40px;
+}
+.share-section-title {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+.canvas-preview {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  margin-bottom: 16px;
+  display: block;
+}
+.share-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ══════════════════════════════════════════════════
+   FOOTER
+══════════════════════════════════════════════════ */
+footer {
+  position:relative; z-index:10;
+  text-align:center;
+  padding:32px 24px;
+  font-size:0.68rem;
+  color:rgba(240,237,232,0.18);
+  letter-spacing:0.08em;
+  line-height:1.8;
+  border-top:1px solid var(--border);
+}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════ */
+@media (max-width:640px) {
+  .navbar { padding:20px 24px; }
+  .navbar .logo { font-size:0.9rem; }
+  .os-visual { grid-template-columns:1fr; }
+  .os-divider { padding:12px 0; }
+  .os-panel.left, .os-panel.right { border-radius:var(--r); border:1px solid; }
+  .os-panel.left  { border-color:rgba(192,57,43,0.25); }
+  .os-panel.right { border-color:rgba(26,188,156,0.2); }
+  .q-card { padding:32px 24px 28px; }
+  .result-actions, .share-actions { flex-direction:column; }
+  .cp-num { font-size:2.5rem; }
+  .score-labels { gap:8px; }
+  .slabel-pct { font-size:2rem; }
+  .result-content { padding:36px 24px 60px; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero-bg">
+  <div class="hero-bg-gradient" id="bgGrad"></div>
+  <div class="hero-bg-grid"></div>
+</div>
+<div class="particles" id="particles"></div>
+
+<!-- ══════════════════════════════════════════════════
+     INTRO
+══════════════════════════════════════════════════ -->
+<div id="intro" class="screen active">
+  <nav class="navbar">
+    <div class="logo">Матриця<span> ·</span> Мислення</div>
+    <div class="global-counter">
+      <div class="counter-dot"></div>
+      <span class="counter-num" id="global-count">—</span>
+      <span class="counter-label">пройшли тест</span>
+    </div>
+  </nav>
+
+  <div class="hero-content">
+    <div class="hero-badge">Тест для саморефлексії</div>
+
+    <h1 class="hero-title">
+      Яка матриця<br>
+      <em>у твоїй голові?</em>
+    </h1>
+
+    <p class="hero-subtitle">
+      Закон і Благодать — це не просто богословські слова.<br>
+      Це дві несумісні операційні системи. Тільки одна може справді керувати твоїм мисленням про Бога, себе і світ.
+    </p>
+
+    <div class="os-visual">
+      <div class="os-panel left">
+        <span class="os-icon">⚖️</span>
+        <div class="os-name">Закон</div>
+        <div class="os-desc">Ти перший — Бог реагує.<br>Досягнення, страх, справедливість.<br>Відносини — умовні.</div>
+      </div>
+      <div class="os-divider">vs</div>
+      <div class="os-panel right">
+        <span class="os-icon">🌿</span>
+        <div class="os-name">Благодать</div>
+        <div class="os-desc">Бог перший — ти відповідаєш.<br>Дар, любов, відносини.<br>Ти — дитина, а не підрядник.</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-pill">15 питань</div>
+      <div class="stat-pill">~5 хвилин</div>
+      <div class="stat-pill">3 профілі</div>
+      <div class="stat-pill">Шкала 1–5</div>
+    </div>
+
+    <div class="cta-wrap">
+      <button class="btn-cta" onclick="startQuiz()">
+        <span>Почати тест</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <p style="margin-top:28px;font-size:0.7rem;color:rgba(240,237,232,0.25);max-width:440px;line-height:1.7;font-style:italic;">
+      Не офіційна богословська діагностика — інструмент для чесного роздуму.
+      Базується на ідеях проповіді «Закон і Благодать — дві матриці».
+    </p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     QUIZ
+══════════════════════════════════════════════════ -->
+<div id="quiz" class="screen">
+  <nav class="navbar">
+    <div class="logo">Матриця<span> ·</span> Мислення</div>
+    <div class="global-counter">
+      <div class="counter-dot"></div>
+      <span class="counter-num" id="global-count-q">—</span>
+      <span class="counter-label">пройшли</span>
+    </div>
+  </nav>
+
+  <div class="quiz-inner">
+    <div class="cinema-progress">
+      <div class="cp-header">
+        <div class="cp-left">
+          <span class="cp-num" id="cp-num">01</span>
+          <span class="cp-total" id="cp-total">/ 15</span>
+        </div>
+        <span class="cp-theme" id="cp-theme">Образ Бога</span>
+      </div>
+      <div class="cp-track">
+        <div class="cp-fill" id="cp-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="q-card" id="q-card">
+      <div class="q-card-glow"></div>
+      <div class="q-text-main" id="q-text-main">…</div>
+      <div class="scale-wrap">
+        <div class="scale-row" id="scale-row">
+          <button class="s-btn" data-val="1" onclick="pick(1)"><span>1</span></button>
+          <button class="s-btn" data-val="2" onclick="pick(2)"><span>2</span></button>
+          <button class="s-btn" data-val="3" onclick="pick(3)"><span>3</span></button>
+          <button class="s-btn" data-val="4" onclick="pick(4)"><span>4</span></button>
+          <button class="s-btn" data-val="5" onclick="pick(5)"><span>5</span></button>
+        </div>
+        <div class="scale-endpoints">
+          <span class="ep-law">← Зовсім не згоден</span>
+          <span class="ep-grace">Повністю згоден →</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="q-nav">
+      <span class="q-hint" id="q-hint">Обери відповідь, щоб продовжити</span>
+      <button class="btn-cta" id="next-btn" style="display:none" onclick="nextQ()">
+        <span id="next-lbl">Далі</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     RESULT
+══════════════════════════════════════════════════ -->
+<div id="result" class="screen">
+  <nav class="navbar">
+    <div class="logo">Матриця<span> ·</span> Мислення</div>
+    <div class="global-counter">
+      <div class="counter-dot"></div>
+      <span class="counter-num" id="global-count-r">—</span>
+      <span class="counter-label">пройшли тест</span>
+    </div>
+  </nav>
+
+  <div class="result-hero-section" id="result-hero-section">
+    <div class="result-icon-wrap"><span id="result-icon">—</span></div>
+    <div class="result-eyebrow">Твій профіль</div>
+    <div class="result-main-title" id="result-main-title">—</div>
+  </div>
+
+  <div class="score-section">
+    <div class="score-inner">
+      <div class="score-labels">
+        <div class="score-label-item">
+          <span class="slabel-name slabel-law">⚖️ Закон</span>
+          <span class="slabel-pct slabel-law-pct" id="r-law-pct">—</span>
+        </div>
+        <div class="score-label-item">
+          <span class="slabel-name slabel-grace">Благодать 🌿</span>
+          <span class="slabel-pct slabel-grace-pct" id="r-grace-pct">—</span>
+        </div>
+      </div>
+      <div class="gauge-bar">
+        <div class="gauge-law-fill"   id="g-law"></div>
+        <div class="gauge-grace-fill" id="g-grace"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:center;width:100%;">
+    <div class="result-content">
+      <p class="result-description" id="r-desc"></p>
+
+      <div class="quotes-title">Голос цієї системи</div>
+      <div id="r-quotes"></div>
+
+      <div class="cta-card" id="r-cta"></div>
+
+      <div class="result-actions">
+        <button class="btn-sm btn-sm-gold" onclick="restart()">↩ Пройти знову</button>
+        <button class="btn-sm btn-sm-outline" onclick="shareText()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Поділитись текстом
+        </button>
+      </div>
+
+      <!-- Share card section -->
+      <div class="share-section">
+        <div class="share-section-title">📱 Картинка для соцмереж</div>
+        <canvas id="share-canvas" class="canvas-preview" width="1080" height="1080" style="max-width:340px;"></canvas>
+        <div class="share-actions">
+          <button class="btn-sm btn-sm-green" onclick="downloadCard()">
+            ⬇ Зберегти картинку
+          </button>
+          <button class="btn-sm btn-sm-outline" onclick="shareCardNative()">
+            ↗ Поділитись
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  Матриця Мислення · Побудовано на ідеях проповіді «Закон і Благодать — дві матриці» · Інструмент для саморефлексії
+</footer>
+
+<!-- CANVAS (hidden, for image generation) -->
+<canvas id="gen-canvas" width="1080" height="1080" style="display:none;"></canvas>
+
+<script>
+/* ══════════════════════════════════════════════════
+   PARTICLES
+══════════════════════════════════════════════════ */
+(function(){
+  const c = document.getElementById('particles');
+  for(let i=0;i<32;i++){
+    const p = document.createElement('div');
+    p.className = 'pt';
+    const law = Math.random()>0.5;
+    const s = 1.5+Math.random()*4;
+    p.style.cssText = `
+      width:${s}px;height:${s}px;
+      left:${Math.random()*100}%;
+      background:${law ? '#e74c3c':'#1abc9c'};
+      animation-duration:${10+Math.random()*20}s;
+      animation-delay:${-Math.random()*25}s;
+      filter:blur(${Math.random()>.65?1.5:0}px);
+      opacity:0;
+    `;
+    c.appendChild(p);
+  }
+})();
+
+/* ══════════════════════════════════════════════════
+   GLOBAL COUNTER (simulated, realistic)
+══════════════════════════════════════════════════ */
+// Base: plausible number that "grows"
+const BASE_COUNT  = 18340;
+const SESSION_KEY = 'mmtq_session';
+
+function getCount(){
+  const stored = localStorage.getItem(SESSION_KEY);
+  if(stored) return parseInt(stored);
+  // Simulate: random offset to make it look live
+  const offset = Math.floor(Math.random()*80)+10;
+  const count  = BASE_COUNT + offset;
+  localStorage.setItem(SESSION_KEY, count);
+  return count;
+}
+
+function incrementCount(){
+  const c = getCount() + 1;
+  localStorage.setItem(SESSION_KEY, c);
+  return c;
+}
+
+function formatCount(n){
+  if(n>=1000) return (n/1000).toFixed(1).replace('.',',')+'к';
+  return n.toString();
+}
+
+function animateCounter(el, target){
+  const start = target - 40 - Math.floor(Math.random()*30);
+  let cur = start;
+  const step = () => {
+    cur += Math.ceil((target-cur)*0.12) || 1;
+    el.textContent = formatCount(cur);
+    if(cur < target) requestAnimationFrame(step);
+    else el.textContent = formatCount(target);
+  };
+  requestAnimationFrame(step);
+}
+
+function updateAllCounters(n){
+  ['global-count','global-count-q','global-count-r'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) animateCounter(el, n);
+  });
+}
+
+// Init
+updateAllCounters(getCount());
+
+// Simulate live updates every 12–25s
+setInterval(()=>{
+  const c = getCount() + Math.floor(Math.random()*3)+1;
+  localStorage.setItem(SESSION_KEY, c);
+  updateAllCounters(c);
+}, 15000 + Math.random()*10000);
+
+/* ══════════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════════ */
+const QUESTIONS = [
+  {text:"Якщо я згрішу і не встигну покаятись — Бог може відібрати в мене спасіння.", type:"law",   theme:"Спасіння"},
+  {text:"Бог уже любить мене — незалежно від того, наскільки добре я справляюсь у вірі.",  type:"grace", theme:"Образ Бога"},
+  {text:"Мені складно уявити Бога без справедливого покарання для тих, хто грішить.",       type:"law",   theme:"Справедливість"},
+  {text:"Коли я думаю про Бога, першою думкою є «Він Отець», а не «Він Суддя».",           type:"grace", theme:"Образ Бога"},
+  {text:"Я часто відчуваю, що маю більше служити або жертвувати, щоб зберегти Божу прихильність.", type:"law", theme:"Відносини"},
+  {text:"Я вірю, що Бог зробив перший крок до мене — ще до того, як я щось зробив.",      type:"grace", theme:"Ініціатива"},
+  {text:"Ад — це справедлива і необхідна частина Божого порядку.",                         type:"law",   theme:"Суд"},
+  {text:"Любов і милість для мене важливіші за справедливість і покарання.",               type:"grace", theme:"Цінності"},
+  {text:"Я інколи боюсь, що Бог «викреслить» мене, якщо я недостатньо старатимусь.",      type:"law",   theme:"Страх"},
+  {text:"Спасіння — це дар, а не нагорода за мої зусилля чи правильне життя.",            type:"grace", theme:"Спасіння"},
+  {text:"Справжній вірянин відрізняється від інших тим, що більше дотримується Божих правил.", type:"law", theme:"Ідентичність"},
+  {text:"Коли я читаю про Бога, мені ближчий образ батька, що обіймає, ніж судді, що зважує.", type:"grace", theme:"Образ Бога"},
+  {text:"Мені здається, Бог більш задоволений тими, хто більше служить і ходить до церкви.",  type:"law",   theme:"Служіння"},
+  {text:"Я вважаю, що Бог любить весь світ однаково — і «добрих», і «поганих» людей.",   type:"grace", theme:"Любов"},
+  {text:"Думка про те, що закон і благодать — несумісні системи, здається мені неприйнятною.", type:"law", theme:"Матриця"}
+];
+
+const P = {
+  law:{
+    title:"Система Закону",
+    icon:"⚖️",
+    css:"law",
+    color:"#e74c3c",
+    desc:"Твоє мислення переважно побудоване на логіці закону: «я перший — Бог реагує». Бог постає передусім як Суддя, а відносини з Ним — умовні. Виконав — отримаєш; не дотягнув — втратиш. Звідси внутрішнє напруження, страх помилки і відчуття, що завжди треба робити більше.",
+    quotes:[
+      "«У законі є твоє досягнення. Відносини вибудовуються, починаючи з тебе. У благодаті — починаючи від Бога.»",
+      "«В системі закону є досягнення, яких ніхто не досяг і ніколи не досягне.»",
+      "«Якщо у твоїй благодаті ще існує закон — ти будеш казати: у цьому світі немає справедливості.»"
+    ],
+    ctaTitle:"Що варто спробувати",
+    ctaText:"Постав собі просте питання: «Чи хочу я, щоб Бог ставився до мене по справедливості — чи по милості?» Якщо по милості — дозволь Йому ставитись так само до інших. Система благодаті починається саме тут."
+  },
+  grace:{
+    title:"Система Благодаті",
+    icon:"🌿",
+    css:"grace",
+    color:"#1abc9c",
+    desc:"Твоє мислення переважно побудоване на логіці благодаті: Бог перший, а ти відповідаєш на Його дію. Бог для тебе — передусім Отець, а не Суддя. Спасіння — дар, а не нагорода. Відносини з Богом не треба «заробляти» — вони вже вибудовані з Його боку. Це основа справжньої внутрішньої свободи.",
+    quotes:[
+      "«У благодаті Бог перший, а людина відповідає на Його дію. Наше змінене життя — результат Бога.»",
+      "«В системі благодаті є життя, і до того ж вічне. Є життя з надлишком.»",
+      "«Якщо ти дивишся через благодать — ти бачиш навколо милість і любов.»"
+    ],
+    ctaTitle:"Твоє наступне питання",
+    ctaText:"Ти вже живеш у цій системі — або принаймні відкритий до неї. Досліджуй, де ще залишаються «острівці» закону: страхи, умовні очікування, образ Бога-судді. Саме там є простір для ще більшої свободи."
+  },
+  mixed:{
+    title:"Змішана Матриця",
+    icon:"⚡",
+    css:"mixed",
+    color:"#e8b84b",
+    desc:"У твоїй голові одночасно працюють обидві системи. Це породжує внутрішній «глюк»: ти чуєш про любов Бога і водночас боїшся Його суду; приймаєш благодать і все одно намагаєшся її заслужити. Дві несумісні операційні системи в одній голові — не вирок, а стан, який можна змінити.",
+    quotes:[
+      "«Дві протилежні матриці в одній голові — знаєте, що відбувається? Глюк.»",
+      "«Не пришивають нову латку до старої тканини — після цього дірка буде ще більшою.»",
+      "«Щоб щось зберегти, потрібно щось змінити. Парадигма змінюється легко. Матриця — ні.»"
+    ],
+    ctaTitle:"Що далі",
+    ctaText:"Змішаний стан — це не вирок, а точка відліку. Почни з чесного запитання: «Який образ Бога насправді живе в мені — Суддя чи Отець?» І дозволь собі копати глибше, не боячись незручних питань."
+  }
+};
+
+/* ══════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════ */
+let cur = 0, answers = [], selVal = null;
+let lastResult = {};
+
+/* ══════════════════════════════════════════════════
+   SCREENS
+══════════════════════════════════════════════════ */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>{
+    s.classList.remove('active');
+    s.style.display='none';
+  });
+  const el = document.getElementById(id);
+  el.style.display = 'flex';
+  void el.offsetWidth;
+  el.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ══════════════════════════════════════════════════
+   QUIZ
+══════════════════════════════════════════════════ */
+function startQuiz(){
+  cur=0; answers=new Array(QUESTIONS.length).fill(null); selVal=null;
+  renderQ();
+  showScreen('quiz');
+}
+
+function renderQ(){
+  const q = QUESTIONS[cur];
+  const n = cur+1, tot = QUESTIONS.length;
+  document.getElementById('cp-num').textContent = String(n).padStart(2,'0');
+  document.getElementById('cp-total').textContent = '/ '+tot;
+  document.getElementById('cp-theme').textContent = q.theme;
+  document.getElementById('q-text-main').textContent = q.text;
+  document.getElementById('cp-fill').style.width = ((n-1)/tot*100)+'%';
+
+  selVal = answers[cur];
+  document.querySelectorAll('.s-btn').forEach(b=>{
+    b.classList.toggle('selected', parseInt(b.dataset.val)===selVal);
+  });
+
+  const card = document.getElementById('q-card');
+  card.classList.remove('lean-law','lean-grace');
+  if(selVal!==null){
+    if(q.type==='law' && selVal>=4)   card.classList.add('lean-law');
+    if(q.type==='grace' && selVal>=4) card.classList.add('lean-grace');
+  }
+
+  const has = selVal!==null;
+  document.getElementById('next-btn').style.display = has ? 'inline-flex':'none';
+  document.getElementById('q-hint').style.display   = has ? 'none':'inline';
+  document.getElementById('next-lbl').textContent   = cur===QUESTIONS.length-1 ? 'Завершити':'Далі';
+}
+
+function pick(v){
+  selVal=v; answers[cur]=v;
+  document.querySelectorAll('.s-btn').forEach(b=>{
+    b.classList.toggle('selected', parseInt(b.dataset.val)===v);
+  });
+  document.getElementById('next-btn').style.display='inline-flex';
+  document.getElementById('q-hint').style.display='none';
+}
+
+function nextQ(){
+  if(selVal===null) return;
+  if(cur < QUESTIONS.length-1){ cur++; selVal=answers[cur]; renderQ(); }
+  else showResult();
+}
+
+/* ══════════════════════════════════════════════════
+   RESULT
+══════════════════════════════════════════════════ */
+function showResult(){
+  let lT=0,lM=0,gT=0,gM=0;
+  QUESTIONS.forEach((q,i)=>{
+    const v=answers[i]||3;
+    if(q.type==='law'){lT+=v;lM+=5;}else{gT+=v;gM+=5;}
+  });
+  const lP=Math.round(lT/lM*100), gP=Math.round(gT/gM*100);
+  const key = lP>=65&&gP<=45?'law': gP>=65&&lP<=45?'grace':'mixed';
+  const p = P[key];
+
+  lastResult = {key,lP,gP,p};
+
+  // Hero
+  const hero = document.getElementById('result-hero-section');
+  hero.className = 'result-hero-section '+p.css;
+  document.getElementById('result-icon').textContent = p.icon;
+  const titleEl = document.getElementById('result-main-title');
+  titleEl.textContent = p.title;
+  titleEl.className = 'result-main-title';
+
+  // Scores
+  document.getElementById('r-law-pct').textContent   = lP+'%';
+  document.getElementById('r-grace-pct').textContent = gP+'%';
+
+  // Description
+  document.getElementById('r-desc').textContent = p.desc;
+
+  // Quotes
+  document.getElementById('r-quotes').innerHTML =
+    p.quotes.map(q=>`<div class="quote-item">${q}</div>`).join('');
+
+  // CTA
+  document.getElementById('r-cta').innerHTML =
+    `<div class="cta-card-title">${p.ctaTitle}</div><div class="cta-card-text">${p.ctaText}</div>`;
+
+  showScreen('result');
+
+  // Animate gauges
+  setTimeout(()=>{
+    document.getElementById('g-law').style.width   = lP+'%';
+    document.getElementById('g-grace').style.width = gP+'%';
+  }, 400);
+
+  // Increment counter
+  const newCount = incrementCount();
+  updateAllCounters(newCount);
+
+  // Generate share card
+  setTimeout(()=>generateCard(p, lP, gP), 500);
+}
+
+/* ══════════════════════════════════════════════════
+   SHARE CARD (Canvas)
+══════════════════════════════════════════════════ */
+function generateCard(p, lP, gP){
+  const canvas = document.getElementById('gen-canvas');
+  const ctx    = canvas.getContext('2d');
+  const W=1080, H=1080;
+  ctx.clearRect(0,0,W,H);
+
+  // Background
+  const bg = ctx.createLinearGradient(0,0,W,H);
+  bg.addColorStop(0,'#0d0b11');
+  bg.addColorStop(1,'#0a0d0f');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,W,H);
+
+  // Color accent glow based on profile
+  const glowColors = {law:'rgba(192,57,43,0.3)', grace:'rgba(26,188,156,0.25)', mixed:'rgba(232,184,75,0.25)'};
+  const radG = ctx.createRadialGradient(540,360,0,540,360,600);
+  radG.addColorStop(0, glowColors[p.css]);
+  radG.addColorStop(1,'transparent');
+  ctx.fillStyle = radG;
+  ctx.fillRect(0,0,W,H);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(255,255,255,0.025)';
+  ctx.lineWidth = 1;
+  for(let x=0;x<W;x+=54){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+  for(let y=0;y<H;y+=54){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+  // Top accent line
+  const lineG = ctx.createLinearGradient(0,0,W,0);
+  lineG.addColorStop(0,'#c0392b');
+  lineG.addColorStop(0.5,'#e8b84b');
+  lineG.addColorStop(1,'#1abc9c');
+  ctx.strokeStyle = lineG;
+  ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(0,5); ctx.lineTo(W,5); ctx.stroke();
+
+  // Eyebrow
+  ctx.fillStyle = '#e8b84b';
+  ctx.font = '500 30px Montserrat, sans-serif';
+  ctx.letterSpacing = '8px';
+  ctx.textAlign = 'left';
+  ctx.fillText('МАТРИЦЯ МИСЛЕННЯ', 90, 110);
+
+  // Icon
+  ctx.font = '110px serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(p.icon, 540, 310);
+
+  // Profile label
+  ctx.fillStyle = 'rgba(240,237,232,0.45)';
+  ctx.font = '400 28px Montserrat, sans-serif';
+  ctx.fillText('МІЙ ПРОФІЛЬ', 540, 390);
+
+  // Profile title
+  const titleColors = {law:'#e74c3c', grace:'#1abc9c', mixed:'#e8b84b'};
+  ctx.fillStyle = titleColors[p.css];
+  ctx.font = '700 86px Cormorant Garamond, serif';
+  ctx.fillText(p.title, 540, 490);
+
+  // Divider
+  const divG = ctx.createLinearGradient(90,0,W-90,0);
+  divG.addColorStop(0,'transparent');
+  divG.addColorStop(0.3,'rgba(232,184,75,0.5)');
+  divG.addColorStop(0.7,'rgba(232,184,75,0.5)');
+  divG.addColorStop(1,'transparent');
+  ctx.strokeStyle = divG;
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(90,530); ctx.lineTo(W-90,530); ctx.stroke();
+
+  // Score section bg
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  roundRect(ctx, 90, 560, W-180, 180, 12);
+  ctx.fill();
+
+  // Law label & score
+  ctx.fillStyle = 'rgba(231,76,60,0.9)';
+  ctx.font = '600 26px Montserrat, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.fillText('⚖️  ЗАКОН', 130, 615);
+  ctx.font = '300 72px Cormorant Garamond, serif';
+  ctx.fillText(lP+'%', 130, 695);
+
+  // Grace label & score
+  ctx.fillStyle = 'rgba(26,188,156,0.9)';
+  ctx.font = '600 26px Montserrat, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('БЛАГОДАТЬ  🌿', W-130, 615);
+  ctx.font = '300 72px Cormorant Garamond, serif';
+  ctx.fillText(gP+'%', W-130, 695);
+
+  // Gauge bar bg
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  roundRect(ctx, 90, 765, W-180, 20, 10);
+  ctx.fill();
+
+  // Gauge law fill
+  const lawW = (W-180) * lP/100;
+  ctx.fillStyle = ctx.createLinearGradient(90,0,90+lawW,0);
+  ctx.fillStyle = '#c0392b';
+  roundRect(ctx, 90, 765, Math.max(lawW,20), 20, 10);
+  ctx.fill();
+
+  // Gauge grace fill
+  const graceW = (W-180) * gP/100;
+  ctx.fillStyle = '#1abc9c';
+  roundRect(ctx, W-90-Math.max(graceW,20), 765, Math.max(graceW,20), 20, 10);
+  ctx.fill();
+
+  // Quote teaser (first quote, truncated)
+  const quote = p.quotes[0];
+  ctx.fillStyle = 'rgba(240,237,232,0.5)';
+  ctx.font = 'italic 300 32px Cormorant Garamond, serif';
+  ctx.textAlign = 'center';
+  wrapText(ctx, quote, 540, 870, W-200, 42);
+
+  // Bottom footer
+  ctx.fillStyle = 'rgba(240,237,232,0.2)';
+  ctx.font = '400 24px Montserrat, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('matrix-test.app  ·  пройди сам', 540, 1030);
+
+  // Copy to visible preview
+  const preview = document.getElementById('share-canvas');
+  const pCtx = preview.getContext('2d');
+  pCtx.drawImage(canvas, 0,0);
+}
+
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+}
+
+function wrapText(ctx, text, x, y, maxW, lineH){
+  const words = text.split(' ');
+  let line = '';
+  let ly = y;
+  for(let w of words){
+    const test = line + w + ' ';
+    if(ctx.measureText(test).width > maxW && line){
+      ctx.fillText(line.trim(), x, ly);
+      line = w+' ';
+      ly += lineH;
+    } else {
+      line = test;
+    }
+  }
+  ctx.fillText(line.trim(), x, ly);
+}
+
+/* ══════════════════════════════════════════════════
+   SHARE ACTIONS
+══════════════════════════════════════════════════ */
+function downloadCard(){
+  const canvas = document.getElementById('gen-canvas');
+  const a = document.createElement('a');
+  a.download = 'matrytsya-myslennya.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+async function shareCardNative(){
+  const canvas = document.getElementById('gen-canvas');
+  const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+  const file = new File([blob], 'matrytsya-myslennya.png', {type:'image/png'});
+  if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+    await navigator.share({
+      title:'Яка матриця у твоїй голові?',
+      text:`Мій результат: ${lastResult.p?.title}`,
+      files:[file]
+    });
+  } else {
+    downloadCard();
+  }
+}
+
+function shareText(){
+  const r = lastResult;
+  if(!r.p) return;
+  const text = `Я пройшов тест «Яка матриця у твоїй голові?»\nМій результат: ${r.p.title}\n⚖️ Закон: ${r.lP}%  🌿 Благодать: ${r.gP}%\nПройди сам →`;
+  if(navigator.share){
+    navigator.share({title:'Матриця Мислення', text});
+  } else if(navigator.clipboard){
+    navigator.clipboard.writeText(text).then(()=>alert('Скопійовано! Постав у пост або сторіс.'));
+  }
+}
+
+function restart(){
+  startQuiz();
+}
+</script>
+</body>
+</html>
